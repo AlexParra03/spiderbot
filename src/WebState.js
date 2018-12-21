@@ -3,13 +3,13 @@
  */
 class WebState {
     constructor() {
-        /** Map where key: url(string) and value: Web-Object */
+        /** Map where key: url(string) and value: a Web-Object */
         this.webpages = new Map();
     }
 
     /**
      * TODO Format url before adding
-     * @param {srting: formated url of the page to be added} url 
+     * @param {string} url  of the page to be added
      */
     addWebpage(url) {
         if(!this.webpages.has(url)) {
@@ -32,7 +32,7 @@ class WebState {
     }
 
     __createWebpage(url) {
-        this.webpages.set(url, WebNode(url));
+        this.webpages.set(url, new WebNode(url));
     }
 }
 
