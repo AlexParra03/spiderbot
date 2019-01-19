@@ -1,4 +1,5 @@
 const __request = require("request");
+const __cheerio = require("cheerio");
 
 class RequestHTML {
   constructor() {
@@ -10,7 +11,7 @@ class RequestHTML {
   }
 
   /**
-   * Creates a promise
+   * Creates a promise for the HTML get method
    * @param {Object} options used as a parameter in the 'request' library
    */
   __fetchPage(options) {
@@ -29,6 +30,7 @@ class RequestHTML {
    * Promise that returns the HTML content of a page.
    * Ex: instance.get("https://example.com").then( function (html) ... )
    * @param {String} url of the page to fetch
+   * @return {Promise: HTML if fulfilled}
    */
   get(url) {
     const options = { url: url, headers: this.headers };
@@ -37,7 +39,7 @@ class RequestHTML {
         return response.body;
       },
       function(err) {
-        console.log(err);
+        return new Error(err);
       }
     );
   }
@@ -45,15 +47,17 @@ class RequestHTML {
   /**
   * Getting all the absolute and relative links from HTML
   * @param {String} html page to be crawled
-  * @return {Array} URLs grabbed from the html
+  * @return {Promise: Array of Strings if fulfilled} URLs grabbed from the html
   */
-  getPaths(html) {
-    const urls = [];
-    const $ = cheerio.load(html);
+  async getPaths(url) {
+    const paths = [];
+    const html = await this.get(url);
+    // console.log(html);
+    const $ = __cheerio.load(html);
     const links = $('a');
     $(links).each(function(i, link){
-      urls.push($(link).attr('href'));
+      paths.push($(link).attr('href'));
     });
-    return urls;
+    return paths;
   }
 }
