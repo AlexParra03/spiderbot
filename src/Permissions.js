@@ -1,14 +1,15 @@
-const DEFAULT_PERMISSION = true;
 class Permissions {}
 
 /**
  * 'Trie' Used to match expression rules from robots.txt
  *  https://developers.google.com/search/reference/robots_txt
+ *  @param {boolean} DEFAULT_PERMISSION the default settings when path its not defined in the rules
  */
 class ExpressionTree {
-  constructor() {
+  constructor(DEFAULT_PERMISSION) {
     // dummy node
     this.root = new ExpressionNode("");
+    this.DEFAULT_PERMISSION = DEFAULT_PERMISSION;
   }
 
   /**
@@ -42,7 +43,7 @@ class ExpressionTree {
     return this.__evaluateExpression(
       expression,
       this.root,
-      DEFAULT_PERMISSION
+      this.DEFAULT_PERMISSION
     );
   }
 
@@ -54,7 +55,7 @@ class ExpressionTree {
    */
   __evaluateExpression(expression, node, currentVeredict) {
     if (expression.length == 0) {
-      if(DEFAULT_PERMISSION) {
+      if(this.DEFAULT_PERMISSION) {
         return (node.disallowFlag) ? false : currentVeredict;
       } else {
         return (node.allowFlag) ? true : currentVeredict;
@@ -127,4 +128,10 @@ class ExpressionNode {
     /** Flag that indicates that path from root to here is a 'disallow' rule */
     this.disallowFlag = false;
   }
+}
+
+module.exports = {
+  Permissions: Permissions,
+  ExpressionTree: ExpressionTree,
+  ExpressionNode: ExpressionNode
 }
