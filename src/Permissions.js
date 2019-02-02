@@ -1,4 +1,26 @@
-class Permissions {}
+class Permissions {
+  constructor() {
+    this.DEFAULT_PERMISSION = true;
+    this.trie = new ExpressionTree(this.DEFAULT_PERMISSION);
+  }
+
+  /**
+   * Adds a new path to the set of rules
+   * @param {string} path path to be added to the set of rules in permissions 
+   * @param {string} ruleType rule type (allow/disallow) specified in the line of robots.txt
+   */
+  addPath(path, ruleType) {
+    this.trie.addExpression(path, ruleType);
+  }
+
+  /**
+   * 
+   * @param {string} path path to be tested against the set of rules 
+   */
+  isAllowed(path) {
+    return this.trie.evaluateExpression(path);
+  }
+}
 
 /**
  * 'Trie' Used to match expression rules from robots.txt
