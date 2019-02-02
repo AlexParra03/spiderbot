@@ -54,21 +54,30 @@ class ExpressionTree {
    * @param {boolean} currentVeredict if path is allowed, replaced when a longer expression is found (longest expression rules in robots.txt)
    */
   __evaluateExpression(expression, node, currentVeredict) {
+    if (node.children.has("$")) {
+      const endOfLineNode = node.children.get("$");
+      if (endOfLineNode.allowFlag && expression.length == 0) {
+        return true;
+      }
+      if (endOfLineNode.disallowFlag && expression.length == 0) {
+        return false;
+      }
+    }
     if (expression.length == 0) {
-      if(this.DEFAULT_PERMISSION) {
-        return (node.disallowFlag) ? false : currentVeredict;
+      if (this.DEFAULT_PERMISSION) {
+        return node.disallowFlag ? false : currentVeredict;
       } else {
-        return (node.allowFlag) ? true : currentVeredict;
+        return node.allowFlag ? true : currentVeredict;
       }
     }
 
     let newVeredict = currentVeredict;
     // most recent (longest) expression matched a disallowed path, not longer allowed
-    if(node.disallowFlag) {
+    if (node.disallowFlag) {
       newVeredict = false;
     }
     // most recent (longest) expression matched an allowed path, overrides disallowed
-    if(node.allowFlag) {
+    if (node.allowFlag) {
       newVeredict = true;
     }
     if (node.children.has("*")) {
@@ -76,30 +85,18 @@ class ExpressionTree {
       const veredicts = [];
       const wildcardStartNode = node.children.get("*");
       // recursive trying all prefixes, wildcard *
-      for(let i=0; i<expression.length; i++) {
+      for (let i = 0; i < expression.length; i++) {
         const postFix = expression.substr(i);
-        veredicts.push(this.__evaluateExpression(
-          postFix,
-          wildcardStartNode,
-          newVeredict
-        ));
+        veredicts.push(
+          this.__evaluateExpression(postFix, wildcardStartNode, newVeredict)
+        );
       }
-      
-      for(let i=0; i<veredicts.length; i++) {
-        if(veredicts[i] != DEFAULT_PERMISSION) {
+
+      for (let i = 0; i < veredicts.length; i++) {
+        if (veredicts[i] != this.DEFAULT_PERMISSION) {
           newVeredict = veredicts[i];
           break;
         }
-      }
-
-    }
-    if (node.children.has("$")) {
-      const endOfLineNode = node.children.get("$");
-      if(endOfLineNode.allowFlag && expression.length == 1) {
-        return true;
-      }
-      if(endOfLineNode.disallowFlag && expression.length == 1) {
-        return false;
       }
     }
     if (node.children.has(expression[0])) {
@@ -109,7 +106,7 @@ class ExpressionTree {
         newVeredict
       );
     }
-    
+
     return newVeredict;
   }
 }
@@ -134,4 +131,4 @@ module.exports = {
   Permissions: Permissions,
   ExpressionTree: ExpressionTree,
   ExpressionNode: ExpressionNode
-}
+};
