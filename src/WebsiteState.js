@@ -5,14 +5,23 @@ class WebsiteState {
   /**
    * https://websitebuilders.com/how-to/web-at-a-glance/url-examples/
    * @param {string} protocol Ex. http, https
-   * @param {string} topLevelDomain Ex. .com, .edu
-   * @param {string} domainName
+   * @param {string} networkLocation Domain, Ex. example.com, www.page.edu
    */
-  constructor(protocol, topLevelDomain, domainName) {
+  constructor(protocol, networkLocation) {
     this.protocol = protocol;
-    this.topLevelDomain = topLevelDomain;
-    this.domainName = domainName;
+    this.networkLocation = networkLocation;
     this.pathTree = new PathTree();
+  }
+
+  /**
+    Returns an iterable to iterate over new paths from the tree path
+   */
+  getUnvisitedPaths() {
+    return this.pathTree.__pathsGenerator("", this.pathTree.root);
+  }
+
+  addPath(path) {
+    this.pathTree.addPath(path);
   }
 }
 
@@ -25,7 +34,9 @@ class PathTree {
   }
 
   /**
-   * A path formated where each '/' should be before each file/folder (can't end with '/'). Ex. /a/b/c, /a/b
+   * TODO handle ending slashed. Not all paths end in slash
+   * A path formated where each '/' should be before each file/folder (can't end
+   * with '/'). Ex. /a/b/c, /a/b
    * @param {string} path should be a path starting with '/'
    */
   addPath(path) {
@@ -33,8 +44,7 @@ class PathTree {
     let currentPathNode = this.root;
     paths.forEach(function(currentPath) {
       const childPathNode = currentPathNode.children.find(
-        childPath => childPath.name === currentPath
-      );
+          childPath => childPath.name === currentPath);
       if (!childPathNode) {
         const newPathNode = new PathNode(currentPath);
         currentPathNode.children.push(newPathNode);
@@ -44,14 +54,30 @@ class PathTree {
       }
     });
   }
+
+  /**
+   * Generator that yields a path recursively when it has not been visited
+   */
+  * __pathsGenerator(path, node) {
+    const currentPath = path + node.name + "/";
+    if (!node.visited) {
+      yield currentPath;
+      node.visited = true;
+    }
+    for (const child of node.children) {
+      yield * this.__pathsGenerator(currentPath, child);
+    }
+  }
 }
 
 class PathNode {
   constructor(name) {
     this.name = name;
     this.visited = false;
-    /** if have permissions to visit the path. null if we haven't checked */
-    this.allowed = null;
     this.children = [];
   }
 }
+
+module.exports = {
+  WebsiteState: WebsiteState
+};

@@ -30,34 +30,21 @@ class RequestHTML {
    * Promise that returns the HTML content of a page.
    * Ex: instance.get("https://example.com").then( function (html) ... )
    * @param {String} url of the page to fetch
-   * @return {Promise: HTML if fulfilled}
+   * @return {Promise: IncomingMessage if fulfilled} Incoming message object ((https://nodejs.org/api/http.html#http_class_http_incomingmessage)
    */
   get(url) {
     const options = { url: url, headers: this.headers };
     return this.__fetchPage(options).then(
       function(response) {
-        return response.body;
+        return response;
       },
       function(err) {
         return new Error(err);
       }
     );
   }
-
-  /**
-  * Getting all the absolute and relative links from HTML
-  * @param {String} html page to be crawled
-  * @return {Promise: Array of Strings if fulfilled} URLs grabbed from the html
-  */
-  async getPaths(url) {
-    const paths = [];
-    const html = await this.get(url);
-    // console.log(html);
-    const $ = __cheerio.load(html);
-    const links = $('a');
-    $(links).each(function(i, link){
-      paths.push($(link).attr('href'));
-    });
-    return paths;
-  }
 }
+
+module.exports = {
+  RequestHTML: RequestHTML
+};
