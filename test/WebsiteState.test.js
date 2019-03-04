@@ -3,6 +3,29 @@ const {WebsiteState} = require("../src/WebsiteState");
 
 describe("Website State", function() {
   describe("Generator", function() {
+
+    it("should iterate over path with no slash", function() {
+      const websiteState = new WebsiteState();
+      websiteState.pathTree.addPath("/a");
+
+      const paths = [];
+      for (const path of websiteState.getUnvisitedPaths()) {
+        paths.push(path);
+      }
+      expect(paths).to.eql(["/", "/a"]);
+    });
+
+    it("should iterate over path with slash", function() {
+      const websiteState = new WebsiteState();
+      websiteState.pathTree.addPath("/a/");
+
+      const paths = [];
+      for (const path of websiteState.getUnvisitedPaths()) {
+        paths.push(path);
+      }
+      expect(paths).to.eql(["/", "/a/"]);
+    });
+
     it("should iterate only over new paths added", function() {
       const websiteState = new WebsiteState();
       websiteState.pathTree.addPath("/a/b/c");
@@ -18,7 +41,7 @@ describe("Website State", function() {
       for (const path of websiteState.getUnvisitedPaths()) {
         paths.push(path);
       }
-      expect(paths).to.eql(["/a/b1/c1/", "/a/b1/c2/"]);
+      expect(paths).to.eql(["/a/b1/c1", "/a/b1/c2"]);
     });
 
     it("should iterate over path added", function() {
@@ -29,7 +52,7 @@ describe("Website State", function() {
       for (const path of websiteState.getUnvisitedPaths()) {
         paths.push(path);
       }
-      expect(paths).to.eql(["/", "/a/"]);
+      expect(paths).to.eql(["/", "/a"]);
     });
 
     it("should iterate over parent paths added", function() {
@@ -40,7 +63,7 @@ describe("Website State", function() {
       for (const path of websiteState.getUnvisitedPaths()) {
         paths.push(path);
       }
-      expect(paths).to.eql(["/", "/a/", "/a/b/"]);
+      expect(paths).to.eql(["/", "/a/", "/a/b"]);
     });
   });
 

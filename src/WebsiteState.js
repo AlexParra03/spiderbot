@@ -20,18 +20,14 @@ class WebsiteState {
     return this.pathTree.__pathsGenerator("", this.pathTree.root);
   }
 
-  addPath(path) {
-    this.pathTree.addPath(path);
-  }
+  addPath(path) { this.pathTree.addPath(path); }
 }
 
 /**
  * Tree structure used to store path routes
  */
 class PathTree {
-  constructor() {
-    this.root = new PathNode('');
-  }
+  constructor() { this.root = new PathNode(''); }
 
   /**
    * TODO handle ending slashed. Not all paths end in slash
@@ -40,6 +36,7 @@ class PathTree {
    * @param {string} path should be a path starting with '/'
    */
   addPath(path) {
+    const endsWithSlash = path[path.length - 1] === '/';
     const paths = path.split('/').filter(elem => elem.trim() !== '');
     let currentPathNode = this.root;
     paths.forEach(function(currentPath) {
@@ -49,6 +46,9 @@ class PathTree {
         const newPathNode = new PathNode(currentPath);
         currentPathNode.children.push(newPathNode);
         currentPathNode = newPathNode;
+        if (currentPath == paths[paths.length - 1]) {
+          newPathNode.endsWithSlash = endsWithSlash;
+        }
       } else {
         currentPathNode = childPathNode;
       }
@@ -59,7 +59,9 @@ class PathTree {
    * Generator that yields a path recursively when it has not been visited
    */
   * __pathsGenerator(path, node) {
-    const currentPath = path + node.name + "/";
+    const endingSlash =
+        (node.children.length > 0 || node.endsWithSlash) ? '/' : '';
+    const currentPath = path + node.name + endingSlash;
     if (!node.visited) {
       yield currentPath;
       node.visited = true;
@@ -74,6 +76,7 @@ class PathNode {
   constructor(name) {
     this.name = name;
     this.visited = false;
+    this.endsWithSlash = true;
     this.children = [];
   }
 }
