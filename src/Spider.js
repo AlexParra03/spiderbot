@@ -87,6 +87,8 @@ class Spider {
         } else {
           absolutePath = Path.join(path, parsedURL.path);
         }
+        // backward slash replaced for Windows OS
+        absolutePath = absolutePath.replace(/[\\]/g, '/');
 
         if (parsedURL.hostname) {
           // URL has a hostname
