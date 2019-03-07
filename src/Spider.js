@@ -19,14 +19,13 @@ class Spider {
   async crawlOnce() {
     const permissionHelper = new Permissions();
     const website = this.frontier.pop();
-    // const url = URL.parse(this.frontier.pop());
     if (!this.WWWState.hasWebsite(website.networkLocation)) {
       let robotsTxt = "";
       let incomingMessage = null;
       try {
         incomingMessage = await this.requestHTML.get(
             website.protocol + "://" + website.networkLocation + "/robots.txt");
-        if(typeof incomingMessage === "undefined") {
+        if (incomingMessage === undefined) {
           return;
         }
         if (incomingMessage.statusCode == 200) {
@@ -82,6 +81,11 @@ class Spider {
 
 
         let absolutePath = '';
+        if (parsedURL.path === "null"  || typeof parsedURL.path !== "string" || parsedURL.protocol === "null" ||
+            parsedURL.host === "null") {
+          continue;
+        }
+
         if (Path.isAbsolute(parsedURL.path)) {
           absolutePath = Path.normalize(parsedURL.path);
         } else {
@@ -96,14 +100,11 @@ class Spider {
             website.addPath(absolutePath);
           } else {
             // add other website with the path
-
-            this.WWWState.addWebpage(parsedURL.protocol,
-                                     parsedURL.host);
+            this.WWWState.addWebpage(parsedURL.protocol, parsedURL.host);
             const newOrigin = this.WWWState.get(parsedURL.host);
             newOrigin.addPath(absolutePath);
             this.frontier.unshift(newOrigin);
-            this.WWWState.linkWebpage(website.networkLocation,
-                                      parsedURL.host);
+            this.WWWState.linkWebpage(website.networkLocation, parsedURL.host);
           }
         } else {
           website.addPath(absolutePath);
