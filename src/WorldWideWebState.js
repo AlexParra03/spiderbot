@@ -29,6 +29,7 @@ class WorldWideWebState {
     } else {
       this.websites.set(websiteDomainName,
                         new WebsiteState(websiteProtocol, websiteDomainName));
+      this.neighbors.set(websiteDomainName, new Set());
       return true;
     }
     return false;
@@ -49,7 +50,7 @@ class WorldWideWebState {
       return false;
     }
 
-    this.neighbors.set(originDomainName, destinationDomainName);
+    this.neighbors.get(originDomainName).add(destinationDomainName);
     return true;
   }
 
