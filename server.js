@@ -1,12 +1,30 @@
 const express = require("express");
-const path = require('path');
+const path = require("path");
+const {Spider} = require("./src/Spider");
+
+const PORT = 3000;
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/index.html'));
-})
+app.use('/public', express.static(path.join(__dirname, '/client')));
 
-app.listen(3000, () => {
-    console.log('server listening...');
+const spider = new Spider();
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/index.html'));
 });
+
+app.get('/webState', async(req, res) => {
+  console.log(req.query.url);
+  spider.addToFrontier(req.query.url);
+  try {
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+  } catch (e) {
+  }
+
+  // TODO, add method to stringify spider
+  res.send(JSON.stringify(spider.WWWState));
+});
+
+app.listen(PORT, () => {console.log(`Server listening in Port: ${PORT}...`)});

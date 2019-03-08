@@ -14,6 +14,21 @@ class Spider {
   }
 
   /**
+   * Adds a website to the beggining of the queue/frontier
+   * @param {string} website full URL of the website
+   */
+  addToFrontier(website) {
+    const url = URL.parse(website);
+    if (url.protocol && url.host) {
+      const websiteObject = new WebsiteState(url.protocol, url.host);
+      if (url.path) {
+        websiteObject.addPath(url.path);
+      }
+      this.frontier.unshift(websiteObject);
+    }
+  }
+
+  /**
    * Pops a website from the Queue and crawls it
    */
   async crawlOnce() {
@@ -24,7 +39,7 @@ class Spider {
       let incomingMessage = null;
       try {
         incomingMessage = await this.requestHTML.get(
-            website.protocol + "://" + website.networkLocation + "/robots.txt");
+            website.protocol + "//" + website.networkLocation + "/robots.txt");
         if (incomingMessage === undefined) {
           return;
         }
@@ -68,7 +83,7 @@ class Spider {
       if (permissionHelper.isAllowed(path)) {
         try {
           const req = await this.requestHTML.get(
-              website.protocol + '://' + website.networkLocation + path);
+              website.protocol + '//' + website.networkLocation + path);
           html = req.body
         } catch (e) {
           console.error(e);
@@ -81,8 +96,8 @@ class Spider {
 
 
         let absolutePath = '';
-        if (parsedURL.path === "null"  || typeof parsedURL.path !== "string" || parsedURL.protocol === "null" ||
-            parsedURL.host === "null") {
+        if (parsedURL.path === "null" || typeof parsedURL.path !== "string" ||
+            parsedURL.protocol === "null" || parsedURL.host === "null") {
           continue;
         }
 
@@ -178,6 +193,34 @@ class Spider {
           }
         });
     return paths;
+  }
+
+  /**
+   *  Prepares data from W.W.W. for sending to the client for vis.js rendering
+   *  @return {nodes: Array<{id: integer, label: string}>,
+   *           edges: Array<{from: integer: to: integer}> }
+   */
+  getData() {
+    const nodesData = [];
+    let idCounter = 0;
+    for (const domainName of this.WWWState.websites.keys()) {
+      const node = {id: idCounter, label: domainName};
+      nodesData.push(node);
+    }
+    const edgesData = [];
+    for (const domainName of this.WWWState.websites.keys()) {
+      for (const target of this.WWWState.neighbors.get(domainName).keys()) {
+        const domains = nodesData.map(node => node.label);
+        const targetId =
+            domains.findIndex(currentDomain => currentDomain === target);
+        const sourceId =
+            domains.findIndex(currentDomain => currentDomain === domainName);
+        const edge = {from: sourceId, to: targetId};
+        edgesData.push(edge);
+      }
+    }
+
+    return {nodes: nodesData, edges: edgesData};
   }
 }
 

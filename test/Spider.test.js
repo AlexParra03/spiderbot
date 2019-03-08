@@ -222,4 +222,22 @@ describe("Spider", function() {
              .to.eql("path");
        });
   });
+
+  describe("Sending Data", function() {
+    it("should send a node data", function() {
+      const spider = new Spider();
+      spider.WWWState.addWebpage("https", "www.example.com");
+      const nodeData = spider.getData().nodes;
+      expect(nodeData).to.eql([{id: 0, label: "www.example.com"}]);
+    });
+
+    it("should send an edge", function() {
+      const spider = new Spider();
+      spider.WWWState.addWebpage("https", "www.example.com");
+      spider.WWWState.addWebpage("https", "www.site.com");
+      spider.WWWState.linkWebpage("www.example.com", "www.site.com");
+      const data = spider.getData();
+      expect(data.edges).to.eql([{from: 0, to: 1}]);
+    });
+  });
 });
