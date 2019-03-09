@@ -119,7 +119,7 @@ describe("Spider", function() {
   describe("Crawling Pages", function() {
     it("should crawl absolute paths", async function() {
       const spider = new Spider();
-      const website = new WebsiteState("https", "www.example.com");
+      const website = new WebsiteState("https:", "www.example.com");
       const permission = new Permissions();
       Nock("https://www.example.com").get("/").reply(200, `<html>
         <head></head>
@@ -146,7 +146,7 @@ describe("Spider", function() {
 
     it("should crawl relative paths", async function() {
       const spider = new Spider();
-      const website = new WebsiteState("https", "www.example.com");
+      const website = new WebsiteState("https:", "www.example.com");
       const permission = new Permissions();
       Nock("https://www.example.com").get("/").reply(200, `<html>
         <head></head>
@@ -173,7 +173,7 @@ describe("Spider", function() {
 
     it("should crawl a single website from frontier", async function() {
       const spider = new Spider();
-      const website = new WebsiteState("https", "www.example.com");
+      const website = new WebsiteState("https:", "www.example.com");
       const permission = new Permissions();
       spider.frontier = [website];
       Nock("https://www.example.com").get("/").reply(200, `<html>
@@ -202,7 +202,7 @@ describe("Spider", function() {
     it("should crawl a single website from frontier and add external paths",
        async function() {
          const spider = new Spider();
-         const website = new WebsiteState("https", "www.example.com");
+         const website = new WebsiteState("https:", "www.example.com");
          spider.frontier = [website];
          Nock("https://www.example.com").get("/").reply(200, `<html>
         <head></head>

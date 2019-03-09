@@ -24,7 +24,7 @@ app.get('/webState', async(req, res) => {
   }
 
   // TODO, add method to stringify spider
-  res.send(JSON.stringify(spider.WWWState));
+  res.send(JSON.stringify(spider.WWWtoJSON()));
 });
 
 app.listen(PORT, () => {console.log(`Server listening in Port: ${PORT}...`)});

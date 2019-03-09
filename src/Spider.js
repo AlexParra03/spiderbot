@@ -200,12 +200,13 @@ class Spider {
    *  @return {nodes: Array<{id: integer, label: string}>,
    *           edges: Array<{from: integer: to: integer}> }
    */
-  getData() {
+  WWWtoJSON() {
     const nodesData = [];
     let idCounter = 0;
     for (const domainName of this.WWWState.websites.keys()) {
       const node = {id: idCounter, label: domainName};
       nodesData.push(node);
+      idCounter++;
     }
     const edgesData = [];
     for (const domainName of this.WWWState.websites.keys()) {
