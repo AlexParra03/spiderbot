@@ -11,6 +11,8 @@ class Spider {
     this.frontier = [];
     this.requestHTML = new RequestHTML();
     this.WWWState = new WorldWideWebState();
+    this.TOTAL_WEBSITES = 10;
+    this.websitesCrawled = 0;
   }
 
   /**
@@ -31,45 +33,51 @@ class Spider {
   /**
    * Pops a website from the Queue and crawls it
    */
-  async crawlOnce() {
+  async crawl() {
     const permissionHelper = new Permissions();
     if (this.frontier.length === 0) {
       console.log("Finished");
       return;
     }
     const website = this.frontier.pop();
-    if (!this.WWWState.hasWebsite(website.networkLocation)) {
-      let robotsTxt = "";
-      let incomingMessage = null;
-      try {
-        console.log(
-            "Requesting crawling rules from ",
-            website.protocol + "//" + website.networkLocation + "/robots.txt");
-        incomingMessage = await this.requestHTML.get(
-            website.protocol + "//" + website.networkLocation + "/robots.txt");
-        if (incomingMessage === undefined) {
-          return;
-        }
-        if (incomingMessage.statusCode == 200) {
-          robotsTxt = incomingMessage.body;
-        }
-      } catch (err) {
-        console.log(err);
+    let robotsTxt = "";
+    let incomingMessage = null;
+    try {
+      console.log(
+          "Requesting crawling rules from ",
+          website.protocol + "//" + website.networkLocation + "/robots.txt");
+      incomingMessage = await this.requestHTML.get(
+          website.protocol + "//" + website.networkLocation + "/robots.txt");
+      if (incomingMessage === undefined) {
+        return;
       }
-      this.handleRobotstxt(robotsTxt, permissionHelper);
-      const currentHost = incomingMessage.request.uri.host;
-      const currentHostProtocol = incomingMessage.request.uri.protocol;
+      if (incomingMessage.statusCode == 200) {
+        robotsTxt = incomingMessage.body;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    this.handleRobotstxt(robotsTxt, permissionHelper);
+    const currentHost = incomingMessage.request.uri.host;
+    const currentHostProtocol = incomingMessage.request.uri.protocol;
 
-      if (currentHost !== website.networkLocation) {
-        // We were redirected
-        this.WWWState.addWebpage(currentHostProtocol, currentHost);
-        this.WWWState.addWebpage(website.protocol, website.networkLocation);
-        this.WWWState.linkWebpage(website.networkLocation, currentHost)
-      } else {
-        this.WWWState.addWebpage(currentHostProtocol, currentHost);
+    if (currentHost !== website.networkLocation) {
+      // We were redirected
+      this.WWWState.addWebpage(currentHostProtocol, currentHost);
+      this.WWWState.addWebpage(website.protocol, website.networkLocation);
+      this.WWWState.linkWebpage(website.networkLocation, currentHost)
+    } else {
+      this.WWWState.addWebpage(currentHostProtocol, currentHost);
+    }
+    await this.crawlInternalWebsite(website, permissionHelper);
+    console.log("Finished scrapping ", currentHost);
+    this.websitesCrawled++;
+    if (this.websitesCrawled < this.TOTAL_WEBSITES) {
+      try {
+        await this.crawl();
+      } catch (e) {
       }
-      await this.crawlInternalWebsite(website, permissionHelper);
-      console.log("Finished scrapping ", currentHost);
+      console.log("Websites crawled:", this.websitesCrawled);
     }
   }
 

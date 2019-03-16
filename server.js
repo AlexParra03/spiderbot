@@ -16,16 +16,7 @@ app.get('/', (req, res) => {
 app.get('/webState', async(req, res) => {
   spider.addToFrontier(req.query.url);
   try {
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
-    await spider.crawlOnce();
+    await spider.crawl();
   } catch (e) {
   }
 
