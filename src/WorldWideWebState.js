@@ -25,7 +25,6 @@ class WorldWideWebState {
    */
   addWebpage(websiteProtocol, websiteDomainName) {
     if (this.websites.has(websiteDomainName)) {
-      console.error("Webpage to be added already exists");
     } else {
       this.websites.set(websiteDomainName,
                         new WebsiteState(websiteProtocol, websiteDomainName));
@@ -59,11 +58,11 @@ class WorldWideWebState {
    */
   hasWebsite(hostname) { return this.websites.has(hostname); }
 
-/**
- *  Get the Website data-structure from hostname
- * @param {string} hostname
- * @return {WebsiteState} website state data-structure
- */
+  /**
+   *  Get the Website data-structure from hostname
+   * @param {string} hostname
+   * @return {WebsiteState} website state data-structure
+   */
   get(hostname) { return this.websites.get(hostname); }
 }
 

@@ -5,7 +5,7 @@ class RequestHTML {
   constructor() {
     this.headers = {
       "User-Agent":
-        "Captain-Curious (https://github.com/AlexParra03/spiderbot)",
+        "Spider-Explorer (https://github.com/AlexParra03/spiderbot)",
       Accept: "text/html"
     };
   }
@@ -30,7 +30,7 @@ class RequestHTML {
    * Promise that returns the HTML content of a page.
    * Ex: instance.get("https://example.com").then( function (html) ... )
    * @param {String} url of the page to fetch
-   * @return {Promise: IncomingMessage if fulfilled} Incoming message object ((https://nodejs.org/api/http.html#http_class_http_incomingmessage)
+   * @return {Promise: IncomingMessage if fulfilled} Incoming message object (https://nodejs.org/api/http.html#http_class_http_incomingmessage)
    */
   get(url) {
     const options = { url: url, headers: this.headers };

@@ -20,9 +20,9 @@
   </head>
 
   <body>
-    <h1>Hello World</h1>
+    <h1>Web Crawler</h1>
 
-    <p>Select website to crawl:</p>
+    <p>Insert full URL (https://www.example.com) of website to crawl:</p>
     <input type="text" id="starting-url"></input>
     <button onclick="crawl()">Crawl!</button>
 
@@ -32,11 +32,10 @@
     function crawl() {
       fetch('./webState?url=' + encodeURIComponent(document.querySelector('#starting-url').value)).then((res) => {
         var options = {};
-        console.log(res);
-        // initialize your network!
         return res.json();
       }).then((res) => {
-        var network = new vis.Network(container, res, options);
+        console.log(res);
+        var network = new vis.Network(document.getElementById("mynetwork"), res, {});
       });
     }
     </script>

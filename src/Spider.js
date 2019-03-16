@@ -33,11 +33,18 @@ class Spider {
    */
   async crawlOnce() {
     const permissionHelper = new Permissions();
+    if (this.frontier.length === 0) {
+      console.log("Finished");
+      return;
+    }
     const website = this.frontier.pop();
     if (!this.WWWState.hasWebsite(website.networkLocation)) {
       let robotsTxt = "";
       let incomingMessage = null;
       try {
+        console.log(
+            "Requesting crawling rules from ",
+            website.protocol + "//" + website.networkLocation + "/robots.txt");
         incomingMessage = await this.requestHTML.get(
             website.protocol + "//" + website.networkLocation + "/robots.txt");
         if (incomingMessage === undefined) {
@@ -62,6 +69,7 @@ class Spider {
         this.WWWState.addWebpage(currentHostProtocol, currentHost);
       }
       await this.crawlInternalWebsite(website, permissionHelper);
+      console.log("Finished scrapping ", currentHost);
     }
   }
 
@@ -82,9 +90,13 @@ class Spider {
 
       if (permissionHelper.isAllowed(path)) {
         try {
+          console.log("Scrapping ",
+                      website.protocol + '//' + website.networkLocation + path);
           const req = await this.requestHTML.get(
               website.protocol + '//' + website.networkLocation + path);
-          html = req.body
+          if (req !== undefined) {
+            html = req.body
+          }
         } catch (e) {
           console.error(e);
         }
@@ -96,8 +108,8 @@ class Spider {
 
 
         let absolutePath = '';
-        if (parsedURL.path === "null" || typeof parsedURL.path !== "string" ||
-            parsedURL.protocol === "null" || parsedURL.host === "null") {
+        if (parsedURL.path === null || typeof parsedURL.path !== "string" ||
+            parsedURL.protocol === null || parsedURL.host === null) {
           continue;
         }
 
@@ -124,11 +136,10 @@ class Spider {
         } else {
           website.addPath(absolutePath);
         }
+      }
 
-
-        for (const newPath of website.getUnvisitedPaths()) {
-          pathStack.push(newPath);
-        }
+      for (const newPath of website.getUnvisitedPaths()) {
+        pathStack.push(newPath);
       }
     }
   }

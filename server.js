@@ -14,9 +14,15 @@ app.get('/', (req, res) => {
 });
 
 app.get('/webState', async(req, res) => {
-  console.log(req.query.url);
   spider.addToFrontier(req.query.url);
   try {
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
+    await spider.crawlOnce();
     await spider.crawlOnce();
     await spider.crawlOnce();
     await spider.crawlOnce();
@@ -27,4 +33,4 @@ app.get('/webState', async(req, res) => {
   res.send(JSON.stringify(spider.WWWtoJSON()));
 });
 
-app.listen(PORT, () => {console.log(`Server listening in Port: ${PORT}...`)});
+app.listen(PORT, () => {console.log(`Server listening in port: ${PORT}...`)});
