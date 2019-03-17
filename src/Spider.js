@@ -112,6 +112,9 @@ class Spider {
       const urls = this.getLinksfromHTML(html);
 
       for (const url of urls) {
+        if (url === undefined) {
+          continue;
+        }
         const parsedURL = URL.parse(url);
 
 
@@ -130,7 +133,7 @@ class Spider {
 
         if (parsedURL.hostname) {
           // URL has a hostname
-          if (parsedURL.host === website.networkLocation) {
+          if (parsedURL.hostname === website.networkLocation) {
             website.addPath(absolutePath);
           } else {
             // add other website with the path
