@@ -116,8 +116,7 @@ class Spider {
 
 
         let absolutePath = '';
-        if (parsedURL.path === null || typeof parsedURL.path !== "string" ||
-            parsedURL.protocol === null || parsedURL.host === null) {
+        if (typeof parsedURL.path !== "string") {
           continue;
         }
 

@@ -213,9 +213,11 @@ describe("Spider", function() {
       </html>`);
 
          Nock("https://www.example.com").get("/robots.txt").reply(200, "");
+         Nock("https://www.exampletwo.com").get("/robots.txt").reply(200, "");
 
 
-         await spider.crawlOnce();
+         spider.TOTAL_WEBSITES = 1;
+         await spider.crawl();
          expect(spider.frontier.length).to.equal(1);
          const destinationWebsite = spider.WWWState.get('www.exampletwo.com');
          expect(destinationWebsite.pathTree.root.children[0].name)
@@ -227,7 +229,7 @@ describe("Spider", function() {
     it("should send a node data", function() {
       const spider = new Spider();
       spider.WWWState.addWebpage("https", "www.example.com");
-      const nodeData = spider.getData().nodes;
+      const nodeData = spider.WWWtoJSON().nodes;
       expect(nodeData).to.eql([{id: 0, label: "www.example.com"}]);
     });
 
@@ -236,7 +238,7 @@ describe("Spider", function() {
       spider.WWWState.addWebpage("https", "www.example.com");
       spider.WWWState.addWebpage("https", "www.site.com");
       spider.WWWState.linkWebpage("www.example.com", "www.site.com");
-      const data = spider.getData();
+      const data = spider.WWWtoJSON();
       expect(data.edges).to.eql([{from: 0, to: 1}]);
     });
   });
