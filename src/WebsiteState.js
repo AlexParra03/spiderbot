@@ -27,7 +27,11 @@ class WebsiteState {
  * Tree structure used to store path routes
  */
 class PathTree {
-  constructor() { this.root = new PathNode(''); }
+  constructor() {
+    this.root = new PathNode('');
+    this.MAX_NODES = 50;
+    this.currentNodes = 0;
+  }
 
   /**
    * TODO handle ending slashed. Not all paths end in slash
@@ -36,16 +40,24 @@ class PathTree {
    * @param {string} path should be a path starting with '/'
    */
   addPath(path) {
+    if (this.currentNodes >= this.MAX_NODES) {
+      return;
+    }
     const endsWithSlash = path[path.length - 1] === '/';
     const paths = path.split('/').filter(elem => elem.trim() !== '');
     let currentPathNode = this.root;
-    paths.forEach(function(currentPath) {
+    paths.forEach((currentPath) => {
       const childPathNode = currentPathNode.children.find(
           childPath => childPath.name === currentPath);
       if (!childPathNode) {
-        const newPathNode = new PathNode(currentPath);
-        currentPathNode.children.push(newPathNode);
-        currentPathNode = newPathNode;
+        if (this.currentNodes < this.MAX_NODES) {
+          const newPathNode = new PathNode(currentPath);
+          this.currentNodes++;
+          currentPathNode.children.push(newPathNode);
+          currentPathNode = newPathNode;
+          return;
+        }
+
         if (currentPath == paths[paths.length - 1]) {
           newPathNode.endsWithSlash = endsWithSlash;
         }
