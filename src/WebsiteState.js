@@ -49,18 +49,17 @@ class PathTree {
     paths.forEach((currentPath) => {
       const childPathNode = currentPathNode.children.find(
           childPath => childPath.name === currentPath);
-      if (!childPathNode) {
+      if (childPathNode === undefined) {
         if (this.currentNodes < this.MAX_NODES) {
           const newPathNode = new PathNode(currentPath);
           this.currentNodes++;
           currentPathNode.children.push(newPathNode);
           currentPathNode = newPathNode;
-          return;
+          if (currentPath == paths[paths.length - 1]) {
+            newPathNode.endsWithSlash = endsWithSlash;
+          }
         }
 
-        if (currentPath == paths[paths.length - 1]) {
-          newPathNode.endsWithSlash = endsWithSlash;
-        }
       } else {
         currentPathNode = childPathNode;
       }
